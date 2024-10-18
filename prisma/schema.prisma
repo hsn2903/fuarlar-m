@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Fair {
+  id          String   @id @default(cuid())
+  logoImage   String
+  coverImage  String
+  name        String
+  slug        String   @unique
+  website     String
+  type        String
+  category    String
+  description String
+  startDate   DateTime
+  endDate     DateTime
+  venue       String
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+
+
+model Hotel {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  images      HoteImage[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model HoteImage {
+  id      String @id @default(cuid())
+  url     String
+  hotelId String
+  hotel   Hotel  @relation(fields: [hotelId], references: [id],onDelete: Cascade)
+}
+
+// Posts
+
+model Post {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  content     String
+  summary     String
+  author      User      @relation(fields: [authorId], references: [id])
+  authorId    String
+  image       String?
+  tags        PostTag[]
+  isPublished Boolean   @default(false)
+  category    PostCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  categoryId  String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model PostTag {
+  id    String @id @default(cuid())
+  name  String @unique
+  posts Post[]
+}
+
+model PostCategory {
+  id    String @id @default(cuid())
+  name  String @unique
+  posts Post[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("USER")
+  posts     Post[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String
+  message   String
+  interestedFair   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
